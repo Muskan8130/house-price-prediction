@@ -71,20 +71,20 @@ def home():
         high = format_price(int(raw_price * 1.1))
         
         if form_data["city"] == "delhi" and form_data["zone_category"] == "city":
-            explanation.append("✔ Premium city location")
+            explanation.append("Premium city location")
 
         if form_data["zone_category"] == "suburb":
-            explanation.append("✔ Suburban areas have moderate pricing")
+            explanation.append("Suburban areas have moderate pricing")
 
         if form_data["zone_category"] == "urban":
-            explanation.append("✔ Urban areas have balanced pricing")
+            explanation.append("Urban areas have balanced pricing")
 
         if form_data["distance_from_metro_km"] < 2:
-            explanation.append("✔ Close to metro increases price")
+            explanation.append("Close to metro increases price")
         
 
         if form_data["bedrooms"] >= 5:
-           explanation.append("✔ More bedrooms increase price")
+           explanation.append("More bedrooms increase price")
 
         if form_data["total_floors"] > 2:
             explanation.append("Floor numbers increase price")
