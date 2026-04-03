@@ -22,6 +22,7 @@ print(df.head())
 # TODO : STEP 2) Data check and clean
 
 df.columns = df.columns.str.strip().str.lower()
+df = df.drop("avg_price_per_sqft", axis=1)
 print("Check spaces in column name and convert in lower casedf.columns : ",df.columns)
 print("\nDuplicate rows:", df.duplicated().sum())
 print("Check duplicate rows : " ,df.duplicated().sum())
