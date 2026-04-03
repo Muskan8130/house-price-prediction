@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import joblib
 import pandas as pd
+
 app = Flask(
     __name__,
     template_folder="../templates",
@@ -9,11 +10,19 @@ app = Flask(
 
 # Load trained pipeline (preprocessor + model)
 model = joblib.load("models/house_price_model.pkl")
-
+def format_price(price):
+    if price >= 10000000:
+        return f"{price/10000000:.2f} Cr"
+    elif price >= 100000:
+        return f"{price/100000:.2f} Lakh"
+    else:
+        return str(price)
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    predicted_price = None
+    formatted_price = None   # ✅ ADD
+    low = None               # ✅ ADD
+    high = None              # ✅ ADD
 
     if request.method == "POST":
         data = {
@@ -34,9 +43,18 @@ def home():
         }
 
         df = pd.DataFrame([data])
-        predicted_price = int(model.predict(df)[0])
+        raw_price = int(model.predict(df)[0])
 
-    return render_template("index.html", price=predicted_price)
+        formatted_price = format_price(raw_price)
+        low = format_price(int(raw_price * 0.9))
+        high = format_price(int(raw_price * 1.1))
+
+    return render_template(
+        "index.html",
+        price=formatted_price,
+        low=low,
+        high=high
+    )
 
 
 if __name__ == "__main__":
