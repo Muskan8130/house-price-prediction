@@ -427,11 +427,18 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="city">City</label>
-                    <input id="city" name="city" placeholder="e.g., Noida, Delhi" required>
+                    <select id="city" name="city" required onchange="updateLocalities()">
+                      <option value="">Select City</option>
+                      {% for city in city_locality_map.keys() %}
+                      <option value="{{ city }}">{{ city }}</option>
+                      {% endfor %}
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="locality">Locality</label>
-                    <input id="locality" name="locality" placeholder="e.g., Sector 62" required>
+                   <select id="locality" name="locality" required>
+                     <option value="">Select Locality</option>
+                   </select>
                 </div>
                 <div class="form-group">
                     <label for="zone_category">Zone Category</label>
@@ -509,6 +516,26 @@
         {% endif %}
     </div>
 </div>
+<script>
+   
+    const cityLocalityMap = JSON.parse('{{ city_locality_map | tojson | safe }}');
 
+
+    function updateLocalities() {
+        const city = document.getElementById("city").value;
+        const localityDropdown = document.getElementById("locality");
+
+        localityDropdown.innerHTML = "<option value=''>Select Locality</option>";
+
+        if (cityLocalityMap[city]) {
+            cityLocalityMap[city].forEach(loc => {
+                let option = document.createElement("option");
+                option.value = loc;
+                option.text = loc;
+                localityDropdown.appendChild(option);
+            });
+        }
+    }
+</script>
 </body>
 </html>
