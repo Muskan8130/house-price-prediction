@@ -44,6 +44,7 @@ def home():
     low = None               
     high = None              
     explanation = []
+    confidence = 85  # default
     if request.method == "POST":
         form_data = {
         "city": request.form["city"].lower(),
@@ -90,6 +91,18 @@ def home():
 
         if form_data["area_sqft"] > 2000:
             explanation.append("Area sqft increase price") 
+
+       # simple logic (based on conditions)
+        if form_data["area_sqft"] > 1000:
+            confidence += 2
+
+        if form_data["distance_from_metro_km"] < 3:
+            confidence += 2
+
+        if form_data["bedrooms"] >= 2:
+            confidence += 1
+
+        confidence = min(confidence, 95)  # max limit    
         
     return render_template(
         "index.html",
@@ -97,7 +110,8 @@ def home():
         low=low,
         high=high,
         city_locality_map=city_locality_map,
-        explanation=explanation
+        explanation=explanation,
+        confidence=confidence
     )
 
 
