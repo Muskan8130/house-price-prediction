@@ -110,7 +110,6 @@ scores = cross_val_score(
     scoring="r2"
 )
 
-print("Linear Regression R2:", scores.mean())
 
 # TODO : STEP 7) Random Forest algo
 
@@ -137,24 +136,72 @@ rf_scores = cross_val_score(
     scoring="r2"
 )
 
-print("Random Forest R2:", rf_scores.mean())
 
+# TODO : STEP 7.5 XGBoost Model
+
+from xgboost import XGBRegressor
+
+xgb_pipeline = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        ("model", XGBRegressor(
+            n_estimators=300,
+            learning_rate=0.05,
+            max_depth=6,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            random_state=42
+        ))
+    ]
+)
+
+xgb_scores = cross_val_score(
+    xgb_pipeline,
+    X,
+    y,
+    cv=5,
+    scoring="r2"
+)
+
+# 🔥 YAHI ADD KARNA HAI (exactly yaha)
+
+lr_score = scores.mean()
+rf_score = rf_scores.mean()
+xgb_score = xgb_scores.mean()
+
+print("Linear Regression R2:", lr_score)
+print("Random Forest R2:", rf_score)
+print("XGBoost R2:", xgb_score)
+
+# 🔥 Best model selection
+scores_dict = {
+    "Linear Regression": lr_score,
+    "Random Forest": rf_score,
+    "XGBoost": xgb_score
+}
+
+best_model = max(scores_dict, key=scores_dict.get)
+print("✅ Best Model Selected:", best_model)
+
+if best_model == "Random Forest":
+    final_pipeline = rf_pipeline
+elif best_model == "XGBoost":
+    final_pipeline = xgb_pipeline
+else:
+    final_pipeline = lr_pipeline
 # TODO : STEP 8)  FINAL MODEL TRAINING (ON FULL DATA)
 
-rf_pipeline.fit(X, y)
+
 # ! matplotlip graph---------------------------------
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # Train final RF model on full training data
-rf_pipeline.fit(X_train, y_train)
+final_pipeline.fit(X_train, y_train)
 
-# Get feature names after preprocessing
-feature_names = rf_pipeline.named_steps["preprocessor"].get_feature_names_out()
+feature_names = final_pipeline.named_steps["preprocessor"].get_feature_names_out()
 
-# Get importance
-importances = rf_pipeline.named_steps["model"].feature_importances_
-
+importances = final_pipeline.named_steps["model"].feature_importances_
 # Create DataFrame
 feature_importance_df = pd.DataFrame({
     "feature": feature_names,
@@ -231,8 +278,8 @@ plt.close()
 
 import pandas as pd
 
-feature_names = rf_pipeline.named_steps["preprocessor"].get_feature_names_out()
-importances = rf_pipeline.named_steps["model"].feature_importances_
+feature_names = final_pipeline.named_steps["preprocessor"].get_feature_names_out()
+importances = final_pipeline.named_steps["model"].feature_importances_
 
 feat_imp = pd.DataFrame({
     "feature": feature_names,
@@ -246,7 +293,7 @@ print(feat_imp.head(10))
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import numpy as np
 
-y_pred = rf_pipeline.predict(X_test)
+y_pred = final_pipeline.predict(X_test) 
 
 mae = mean_absolute_error(y_test, y_pred)
 mse = mean_squared_error(y_test, y_pred)
@@ -274,7 +321,7 @@ user_input = pd.DataFrame([{
     "furnishing_status": "semi-furnished"
 }])
 
-predicted_price = rf_pipeline.predict(user_input)
+predicted_price = final_pipeline.predict(user_input)
 print("Predicted House Price:", int(predicted_price[0]))
 
 
@@ -284,7 +331,7 @@ import os
 
 os.makedirs("models", exist_ok=True)
 
-joblib.dump(rf_pipeline, "models/house_price_model.pkl")
+joblib.dump(final_pipeline, "models/house_price_model.pkl")
 
 print("✅ Model saved successfully at models/house_price_model.pkl")
 
