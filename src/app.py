@@ -40,10 +40,10 @@ def format_price(price):
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    formatted_price = None   # ✅ ADD
-    low = None               # ✅ ADD
-    high = None              # ✅ ADD
-
+    formatted_price = None   
+    low = None               
+    high = None              
+    explanation = []
     if request.method == "POST":
         form_data = {
         "city": request.form["city"].lower(),
@@ -68,13 +68,36 @@ def home():
         formatted_price = format_price(raw_price)
         low = format_price(int(raw_price * 0.9))
         high = format_price(int(raw_price * 1.1))
+        
+        if form_data["city"] == "delhi" and form_data["zone_category"] == "city":
+            explanation.append("✔ Premium city location")
 
+        if form_data["zone_category"] == "suburb":
+            explanation.append("✔ Suburban areas have moderate pricing")
+
+        if form_data["zone_category"] == "urban":
+            explanation.append("✔ Urban areas have balanced pricing")
+
+        if form_data["distance_from_metro_km"] < 2:
+            explanation.append("✔ Close to metro increases price")
+        
+
+        if form_data["bedrooms"] >= 5:
+           explanation.append("✔ More bedrooms increase price")
+
+        if form_data["total_floors"] > 2:
+            explanation.append("Floor numbers increase price")
+
+        if form_data["area_sqft"] > 2000:
+            explanation.append("Area sqft increase price") 
+        
     return render_template(
         "index.html",
         price=formatted_price,
         low=low,
         high=high,
-        city_locality_map=city_locality_map
+        city_locality_map=city_locality_map,
+        explanation=explanation
     )
 
 

@@ -512,8 +512,19 @@
             <h3>💎 Estimated Property Value</h3>
             <div class="price">₹ {{ price }}</div>
             <p style="color:white; margin-top:10px;"> Range: ₹ {{ low }} - ₹ {{ high }}</p>
+            {% if explanation %}
+      <div style="margin-top:20px; text-align:left;">
+          <h4 style="color:white;">Why this price?</h4>
+          <ul style="color:white;">
+          {% for item in explanation %}
+          <li>{{ item }}</li>
+           {% endfor %}
+         </ul>
+      </div>
         </div>
         {% endif %}
+        
+      {% endif %}
     </div>
 </div>
 <script>
